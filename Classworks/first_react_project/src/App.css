@@ -1,0 +1,9 @@
+h1 {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-size: 5rem;
+}
+
+h1:hover {
+  color: #ad6d6d;
+  transition: 0.5s;
+}
