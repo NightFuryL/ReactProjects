@@ -8,13 +8,20 @@ function App() {
         courseName="React JS"
         teacher="Володимир Юркевіч"
         credits={10}
+        isActive={true}
       />
       <CourseCard
         courseName="ASP.NET Core"
         teacher="Пшеничний Олександр"
         credits={10}
+        isActive={true}
       />
-      <CourseCard courseName="Хімія" teacher="Професор Сидоренко" credits={2} />
+      <CourseCard
+        courseName="Хімія"
+        teacher="Професор Сидоренко"
+        credits={2}
+        isActive={false}
+      />
     </div>
   );
 }
