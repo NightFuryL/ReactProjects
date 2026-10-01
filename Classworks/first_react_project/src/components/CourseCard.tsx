@@ -1,3 +1,5 @@
+import { useState } from "react";
+import clsx from "clsx";
 interface CourseCard {
   courseName: string;
   teacher: string;
@@ -11,29 +13,35 @@ export default function CourseCard({
   credits,
   isActive = true,
 }: CourseCard) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div
-      className="course-card"
-      style={{
-        border: "1px solid #ccc",
-        padding: "10px",
-        margin: "10px",
-        borderRadius: "5px",
-      }}
+      className={clsx(
+        "p-5 m-2 rounded-lg border-2 shadow-sm transition-all hover:shadow-md w-72",
+        isActive ? "border-green-500 bg-green-50" : "border-gray-300 bg-white",
+      )}
     >
       <h3>{courseName}</h3>
-      <p>Teacher: {teacher}</p>
-      <p>Credits: {credits}</p>
-      <div
-        style={{
-          color: isActive ? "green" : "red",
-          display: "flex",
-          fontWeight: "bold",
-          justifyContent: "space-between",
-        }}
-      >
-        {isActive ? "В процесі вивчення..." : "Курс завершено"}
-      </div>
+      <button className="text-blue-500 mt-2" onClick={() => setIsOpen(!isOpen)}>
+        {isOpen ? "Сховати" : "Показати"}
+      </button>
+      {isOpen && (
+        <div>
+          <p className="text-gray-600 mt-2">Teacher: {teacher}</p>
+          <p className="text-gray-600 mt-2">Credits: {credits}</p>
+          <div
+            className={clsx(
+              "mt-4 font-semibold text-sm px-3 py-1 inline-block rounded-full",
+              isActive
+                ? "bg-green-200 text-green-800"
+                : "bg-gray-200 text-gray-700",
+            )}
+          >
+            {isActive ? "В процесі вивчення..." : "Курс завершено"}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
