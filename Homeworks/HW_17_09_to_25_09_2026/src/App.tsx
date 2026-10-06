@@ -1,122 +1,86 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import CityInfo from "./components/CityInfo";
+import BookInfo from "./components/BookInfo";
+import "./App.css";
+
+const cityData = {
+  cityName: "Одеса",
+  country: "Україна",
+  foundedYear: 1794,
+  attractions: [
+    {
+      id: 1,
+      name: "Одеський національний академічний театр опери та балету",
+      imageUrl:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlW81DVQ3ycpphdD3Kt8EGEuuaX-c-jzOi20YuVPKWLA&s=10",
+    },
+    {
+      id: 2,
+      name: "Потьомкінські сходи",
+      imageUrl:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJqL-vOnrs_sxvoJ3WhO6Okp21c66BYGbvTSXZK19KaA&s=10",
+    },
+    {
+      id: 3,
+      name: "Вулиця Дерибасівська",
+      imageUrl:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdqKCTadN50XJxO6AWszraPMgUPi7k5C4HLeyWZjiaGQ&s=10",
+    },
+  ],
+};
+
+const bookData = {
+  title: "Таємні війни (2015)",
+  author: "Джонатан Гікман (видавництво Marvel, переклад Мрія)",
+  genre: "Комікс, наукова фантастика",
+  pageCount: 312,
+  reviews: [
+    {
+      id: 1,
+      reviewer: "Богля Л.",
+      comment:
+        "Сильна та глибока книга, яка змушує переосмислити багато речей у сучасному світі.",
+      rating: 5,
+    },
+    {
+      id: 2,
+      reviewer: "Марія К.",
+      comment:
+        "Неймовірний сюжет та чудові ілюстрації. Рекомендую всім фанатам коміксів.",
+      rating: 4,
+    },
+    {
+      id: 3,
+      reviewer: "Іван П.",
+      comment:
+        "Деякі моменти були трохи заплутаними, але загалом книга варта уваги.",
+      rating: 5,
+    },
+  ],
+};
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div className="app-container">
+      <header className="main-header">
+        <h1>Дз, інфо про місто та улюблену книгу</h1>
+      </header>
+      <main className="main-content">
+        <CityInfo
+          cityName={cityData.cityName}
+          country={cityData.country}
+          foundedYear={cityData.foundedYear}
+          attractions={cityData.attractions}
+        />
+        <BookInfo
+          title={bookData.title}
+          author={bookData.author}
+          genre={bookData.genre}
+          pageCount={bookData.pageCount}
+          reviews={bookData.reviews}
+        />
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
