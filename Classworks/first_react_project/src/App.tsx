@@ -1,6 +1,8 @@
 import Header from "./components/Header";
+import CourseProgress from "./components/CourseProgress";
 import CourseCard from "./components/CourseCard";
 import Section from "./components/Section";
+import FocusTimer from "./components/FocusTimer";
 import { useState } from "react";
 const myCourses = [
   {
@@ -9,20 +11,26 @@ const myCourses = [
     teacher: "Володимир Юркевіч",
     credits: 10,
     isActive: false,
+    completedLessons: 12,
+    totalLessons: 12,
   },
   {
     id: 2,
     courseName: "React JS",
     teacher: "Володимир Юркевіч",
-    credits: 10,
+    credits: 20,
     isActive: true,
+    completedLessons: 4,
+    totalLessons: 15,
   },
   {
     id: 3,
     courseName: "ASP.NET Core",
     teacher: "Пшеничний Олександр",
-    credits: 10,
+    credits: 20,
     isActive: true,
+    completedLessons: 12,
+    totalLessons: 20,
   },
   {
     id: 4,
@@ -30,6 +38,8 @@ const myCourses = [
     teacher: "Професор Сидоренко",
     credits: 2,
     isActive: false,
+    completedLessons: 12,
+    totalLessons: 23,
   },
 ];
 
@@ -49,15 +59,30 @@ function App() {
     }));
   };
 
-  const filteredCourses = myCourses.filter((course) =>
+  const [courses, setCourses] = useState(myCourses);
+  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+  const selectedCourse = courses.find((c) => c.id === selectedCourseId);
+
+  const filteredCourses = courses.filter((course) =>
     course.courseName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+
+  const handleCompleteLesson = (courseId: number) => {
+    setCourses((prevCourses) =>
+      prevCourses.map((course) =>
+        course.id === courseId && course.completedLessons < course.totalLessons
+          ? { ...course, completedLessons: course.completedLessons + 1 }
+          : course,
+      ),
+    );
+  };
+
   return (
     <div className="App">
       <Header studentName={userProfile.name} />
-      <div className="p-5 m-2 rounded-1g border-2 shadow-sm transition-all hover: shadow-md w-72">
-        <p className="[text-gray-600 mt-2">Група: {userProfile.group}</p>
-        <p className="[text-gray-600 mt-2">
+      <div className="p-5 m-2 rounded-lg border-2 shadow-sm transition-all hover:shadow-md w-72">
+        <p className="text-gray-600 mt-2">Група: {userProfile.group}</p>
+        <p className="text-gray-600 mt-2">
           Статус :{" "}
           {userProfile.isOnline ? (
             <span className="text-green-500">Онлайн</span>
@@ -72,44 +97,57 @@ function App() {
           Змінити статус
         </button>
       </div>
-      <Section title="Мої курси">
-        <input
-          type="text"
-          placeholder="Пошук курсів..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <p>
-          Результати пошуку для: "<strong>{searchQuery}</strong>"
-        </p>
-        <div
-          className="course-list"
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-          }}
-        >
-          {filteredCourses.length != 0 ? (
-            filteredCourses.map((course) => (
-              <CourseCard
-                key={course.id}
-                courseName={course.courseName}
-                teacher={course.teacher}
-                credits={course.credits}
-                isActive={course.isActive}
-              />
-            ))
-          ) : (
-            <p>Немає курсів, що відповідають вашому запиту.</p>
-          )}
-        </div>
-      </Section>
-      <Section title="Мої завдання">
-        <p>Тут будуть домашні завдання...</p>
-      </Section>
-      <Section title="Мої заняття">
-        <p>Тут будуть відвідані та майбутні заняття...</p>
-      </Section>
+
+      <div className="flex flex-col md:flex-row gap-6 items-start">
+        <aside>
+          <CourseProgress
+            course={selectedCourse}
+            onCompleteLesson={() => {
+              if (selectedCourseId !== null) {
+                handleCompleteLesson(selectedCourseId);
+              }
+            }}
+          />
+          <FocusTimer />
+        </aside>
+        <Section title="Мої курси">
+          <input
+            type="text"
+            placeholder="Пошук курсів..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <p>
+            Результати пошуку для: "<strong>{searchQuery}</strong>"
+          </p>
+          <div
+            className="course-list"
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+            }}
+          >
+            {filteredCourses.length != 0 ? (
+              filteredCourses.map((course) => (
+                <CourseCard
+                  key={course.id}
+                  {...course}
+                  isSelected={selectedCourseId === course.id}
+                  onSelect={() => setSelectedCourseId(course.id)}
+                />
+              ))
+            ) : (
+              <p>Немає курсів, що відповідають вашому запиту.</p>
+            )}
+          </div>
+        </Section>
+        <Section title="Мої завдання">
+          <p>Тут будуть домашні завдання...</p>
+        </Section>
+        <Section title="Мої заняття">
+          <p>Тут будуть відвідані та майбутні заняття...</p>
+        </Section>
+      </div>
     </div>
   );
 }
