@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Toaster } from "react-hot-toast";
 import Header from "./components/Header";
 import CourseProgress from "./components/CourseProgress";
 import CourseCard from "./components/CourseCard";
@@ -9,6 +10,7 @@ import LessonCard from "./components/LessonCard";
 import CourseReview from "./components/CourseReview";
 import UserProfile from "./components/UserProfile";
 import StudyLogs from "./components/StudyLogs";
+import StudyReminder from "./components/StudyReminder";
 import "./App.css";
 
 // Курси з класної роботи
@@ -294,8 +296,13 @@ function App() {
               }}
             />
           </Section>
+
+          <Section title="Нагадування про навчання">
+            <StudyReminder />
+          </Section>
         </main>
       </div>
+      <Toaster position="top-right" />
     </div>
   );
 }
