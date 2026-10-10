@@ -8,6 +8,7 @@ import HomeworkCard from "./components/HomeworkCard";
 import LessonCard from "./components/LessonCard";
 import CourseReview from "./components/CourseReview";
 import UserProfile from "./components/UserProfile";
+import StudyLogs from "./components/StudyLogs";
 import "./App.css";
 
 // Курси з класної роботи
@@ -280,6 +281,18 @@ function App() {
           {/* Секція: Відгуки про курс */}
           <Section title="Відгуки про курс">
             <CourseReview initialCourseName={selectedCourse?.courseName} />
+          </Section>
+
+          <Section title="Історія активності">
+            <StudyLogs
+              courseTitle={selectedCourse?.courseName}
+              lessonNumber={selectedCourse ? selectedCourse.completedLessons + 1 : 1}
+              onCompleteLesson={() => {
+                if (selectedCourseId !== null) {
+                  handleCompleteLesson(selectedCourseId);
+                }
+              }}
+            />
           </Section>
         </main>
       </div>
