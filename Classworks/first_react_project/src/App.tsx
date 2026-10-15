@@ -13,45 +13,7 @@ import StudyLogs from "./components/StudyLogs";
 import StudyReminder from "./components/StudyReminder";
 import "./App.css";
 
-// Курси з класної роботи
-const myCourses = [
-  {
-    id: 1,
-    courseName: "HTML/CSS",
-    teacher: "Володимир Юркевіч",
-    credits: 10,
-    isActive: false,
-    completedLessons: 12,
-    totalLessons: 12,
-  },
-  {
-    id: 2,
-    courseName: "React JS",
-    teacher: "Володимир Юркевіч",
-    credits: 20,
-    isActive: true,
-    completedLessons: 4,
-    totalLessons: 15,
-  },
-  {
-    id: 3,
-    courseName: "ASP.NET Core",
-    teacher: "Пшеничний Олександр",
-    credits: 20,
-    isActive: true,
-    completedLessons: 12,
-    totalLessons: 20,
-  },
-  {
-    id: 4,
-    courseName: "Хімія",
-    teacher: "Професор Сидоренко",
-    credits: 2,
-    isActive: false,
-    completedLessons: 12,
-    totalLessons: 23,
-  },
-];
+import { courseDetailsData } from "./data/courses";
 
 // Домашні завдання з Practice_24_09_2026
 const initialHomeworkList = [
@@ -128,39 +90,40 @@ function App() {
     }));
   };
 
-  const [courses, setCourses] = useState(myCourses);
-  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(2);
+  const [courses, setCourses] = useState(courseDetailsData);
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const selectedCourse = courses.find((c) => c.id === selectedCourseId);
 
   const [homeworkList, setHomeworkList] = useState(initialHomeworkList);
 
-  const filteredCourses = courses.filter((course) =>
-    course.courseName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    course.teacher.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCourses = courses.filter(
+    (course) =>
+      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      course.teacher.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const handleCompleteLesson = (courseId: number) => {
+  /*const handleCompleteLesson = (courseId: string) => {
     setCourses((prevCourses) =>
       prevCourses.map((course) =>
         course.id === courseId && course.completedLessons < course.totalLessons
           ? { ...course, completedLessons: course.completedLessons + 1 }
-          : course
-      )
+          : course,
+      ),
     );
-  };
+  };*/
 
   const handleTurnInHomework = (hwId: number) => {
     setHomeworkList((prev) =>
       prev.map((hw) =>
-        hw.id === hwId ? { ...hw, isCompleted: true, score: 11 } : hw
-      )
+        hw.id === hwId ? { ...hw, isCompleted: true, score: 11 } : hw,
+      ),
     );
   };
 
   return (
     <div className="App p-4 max-w-7xl mx-auto">
       {/* Шапка студента */}
-      <Header studentName={userProfile.name} />
+      <Header id={1} />
 
       {/* Головна сітка: Сайдбар зліва + Контент справа */}
       <div className="flex flex-col lg:flex-row gap-6 items-start">
@@ -178,8 +141,12 @@ function App() {
           {/* Віджет групи та статусу з кнопкою перемикання */}
           <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
             <div>
-              <span className="text-xs text-gray-500 uppercase font-semibold block">Група</span>
-              <span className="text-sm font-bold text-gray-800">{userProfile.group}</span>
+              <span className="text-xs text-gray-500 uppercase font-semibold block">
+                Група
+              </span>
+              <span className="text-sm font-bold text-gray-800">
+                {userProfile.group}
+              </span>
             </div>
             <div className="text-right">
               <button
@@ -196,14 +163,15 @@ function App() {
           </div>
 
           {/* Прогрес обраного курсу */}
-          <CourseProgress
+          <CourseProgress id={selectedCourseId} />
+          {/*<CourseProgress
             course={selectedCourse}
             onCompleteLesson={() => {
               if (selectedCourseId !== null) {
                 handleCompleteLesson(selectedCourseId);
               }
             }}
-          />
+          />*/}
 
           {/* Таймер фокусування */}
           <FocusTimer />
@@ -234,7 +202,6 @@ function App() {
                   <CourseCard
                     key={course.id}
                     {...course}
-                    isSelected={selectedCourseId === course.id}
                     onSelect={() => setSelectedCourseId(course.id)}
                   />
                 ))
@@ -282,16 +249,18 @@ function App() {
 
           {/* Секція: Відгуки про курс */}
           <Section title="Відгуки про курс">
-            <CourseReview initialCourseName={selectedCourse?.courseName} />
+            <CourseReview initialCourseName={selectedCourse?.title} />
           </Section>
 
           <Section title="Історія активності">
             <StudyLogs
-              courseTitle={selectedCourse?.courseName}
-              lessonNumber={selectedCourse ? selectedCourse.completedLessons + 1 : 1}
+              courseTitle={selectedCourse?.title}
+              lessonNumber={
+                selectedCourse ? selectedCourse.completedModules + 1 : 1
+              }
               onCompleteLesson={() => {
                 if (selectedCourseId !== null) {
-                  handleCompleteLesson(selectedCourseId);
+                  //handleCompleteLesson(selectedCourseId);
                 }
               }}
             />
