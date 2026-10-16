@@ -14,6 +14,9 @@ import StudyReminder from "./components/StudyReminder";
 import "./App.css";
 
 import { courseDetailsData } from "./data/courses";
+import AssignmentCard from "./components/AssignmentCard";
+import AssignmentDetails from "./components/AssignmentDetails";
+import { assignmentsData } from "./data/assignments";
 
 // Домашні завдання з Practice_24_09_2026
 const initialHomeworkList = [
@@ -90,8 +93,9 @@ function App() {
     }));
   };
 
-  const [courses, setCourses] = useState(courseDetailsData);
+  const [courses] = useState(courseDetailsData);
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null>(null);
   const selectedCourse = courses.find((c) => c.id === selectedCourseId);
 
   const [homeworkList, setHomeworkList] = useState(initialHomeworkList);
@@ -246,6 +250,23 @@ function App() {
               </div>
             </Section>
           </div>
+
+          <Section title="Секція завдань">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+              <div className="flex flex-col gap-3">
+                {assignmentsData.map((assignment) => (
+                  <AssignmentCard
+                    key={assignment.id}
+                    courseTitle={assignment.courseTitle}
+                    issueDate={assignment.issueDate}
+                    isSelected={selectedAssignmentId === assignment.id}
+                    onClick={() => setSelectedAssignmentId(assignment.id)}
+                  />
+                ))}
+              </div>
+              <AssignmentDetails id={selectedAssignmentId} />
+            </div>
+          </Section>
 
           {/* Секція: Відгуки про курс */}
           <Section title="Відгуки про курс">
