@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Toaster } from "react-hot-toast";
 import Header from "./components/Header";
-import CourseProgress from "./components/CourseProgress";
+//import CourseProgress from "./components/CourseProgress/CourseProgress";
 import CourseCard from "./components/CourseCard";
 import Section from "./components/Section";
 import FocusTimer from "./components/FocusTimer";
@@ -17,6 +17,7 @@ import { courseDetailsData } from "./data/courses";
 import AssignmentCard from "./components/AssignmentCard";
 import AssignmentDetails from "./components/AssignmentDetails";
 import { assignmentsData } from "./data/assignments";
+import CourseProgressWrapper from "./components/CourseProgress/CourseProgressWrapper";
 
 // Домашні завдання з Practice_24_09_2026
 const initialHomeworkList = [
@@ -95,7 +96,9 @@ function App() {
 
   const [courses] = useState(courseDetailsData);
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
-  const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null>(null);
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState<
+    string | null
+  >(null);
   const selectedCourse = courses.find((c) => c.id === selectedCourseId);
 
   const [homeworkList, setHomeworkList] = useState(initialHomeworkList);
@@ -167,7 +170,7 @@ function App() {
           </div>
 
           {/* Прогрес обраного курсу */}
-          <CourseProgress id={selectedCourseId} />
+          <CourseProgressWrapper id={selectedCourseId} />
           {/*<CourseProgress
             course={selectedCourse}
             onCompleteLesson={() => {
