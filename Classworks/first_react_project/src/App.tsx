@@ -11,6 +11,8 @@ import CourseReview from "./components/CourseReview";
 import UserProfile from "./components/UserProfile";
 import StudyLogs from "./components/StudyLogs";
 import StudyReminder from "./components/StudyReminder";
+import LoginForm from "./components/LoginForm";
+import EditProfileFrom from "./components/EditProfileForm";
 import "./App.css";
 
 import { courseDetailsData } from "./data/courses";
@@ -75,6 +77,7 @@ const lessonsData = [
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoginModal, setIsLoginModal] = useState(false);
 
   // Профіль студента
   const [userProfile, setUserProfile] = useState({
@@ -131,6 +134,26 @@ function App() {
     <div className="App p-4 max-w-7xl mx-auto">
       {/* Шапка студента */}
       <Header id={1} />
+
+      <button
+        onClick={() => setIsLoginModal(!isLoginModal)}
+        className="fixed right-4 top-4 z-[60] rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
+      >
+        {isLoginModal ? "Закрити" : "Увійти"}
+      </button>
+
+      {isLoginModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Вхід до облікового запису"
+        >
+          <LoginForm />
+        </div>
+      )}
+
+      <EditProfileFrom />
 
       {/* Головна сітка: Сайдбар зліва + Контент справа */}
       <div className="flex flex-col lg:flex-row gap-6 items-start">
