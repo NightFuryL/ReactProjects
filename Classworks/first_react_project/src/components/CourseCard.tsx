@@ -1,13 +1,9 @@
-import { useState } from "react";
-import clsx from "clsx";
 interface CourseCard {
   title: string;
   onSelect: () => void;
 }
 
 export default function CourseCard({ title, onSelect }: CourseCard) {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
     <div
       onClick={onSelect}

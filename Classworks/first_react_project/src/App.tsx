@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import Header from "./components/Header";
 //import CourseProgress from "./components/CourseProgress/CourseProgress";
@@ -18,6 +18,7 @@ import "./App.css";
 import { courseDetailsData } from "./data/courses";
 import AssignmentCard from "./components/AssignmentCard";
 import AssignmentDetails from "./components/AssignmentDetails";
+import AssignmentDetailsSkeleton from "./components/AssignmentDetailsSkeleton";
 import { assignmentsData } from "./data/assignments";
 import CourseProgressWrapper from "./components/CourseProgress/CourseProgressWrapper";
 
@@ -290,7 +291,12 @@ function App() {
                   />
                 ))}
               </div>
-              <AssignmentDetails id={selectedAssignmentId} />
+              <Suspense
+                key={selectedAssignmentId}
+                fallback={<AssignmentDetailsSkeleton />}
+              >
+                <AssignmentDetails id={selectedAssignmentId} />
+              </Suspense>
             </div>
           </Section>
 
