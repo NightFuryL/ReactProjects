@@ -89,7 +89,7 @@ export default function EditProfileForm() {
     <form
       onSubmit={handleSubmit(onSubmit)}
       noValidate
-      className="flex w-full flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+      className="flex w-full flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 m-3.5"
     >
       <div>
         <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">

@@ -2,6 +2,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import api from "../api/client";
 
 const loginSchema = z.object({
   email: z
@@ -20,14 +21,25 @@ export default function LoginForm() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<ILoginForm>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit: SubmitHandler<ILoginForm> = async (data) => {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Відправлені дані: ", data);
+    try {
+      const response = await api.post("/api/login", data);
+      console.log("Відправлені дані: ", response.data);
+
+      const user = response.data;
+    } catch (error) {
+      console.error("Помилка під час відправки даних: ", error);
+      setError("root", {
+        message:
+          "Помилка під час відправки даних. Будь ласка, спробуйте ще раз.",
+      });
+    }
   };
 
   return (
@@ -64,7 +76,11 @@ export default function LoginForm() {
           {...register("email")}
         />
         {errors.email && (
-          <p id="email-error" role="alert" className="text-sm font-medium text-red-600">
+          <p
+            id="email-error"
+            role="alert"
+            className="text-sm font-medium text-red-600"
+          >
             {errors.email.message}
           </p>
         )}
@@ -92,7 +108,11 @@ export default function LoginForm() {
           {...register("password")}
         />
         {errors.password && (
-          <p id="password-error" role="alert" className="text-sm font-medium text-red-600">
+          <p
+            id="password-error"
+            role="alert"
+            className="text-sm font-medium text-red-600"
+          >
             {errors.password.message}
           </p>
         )}
