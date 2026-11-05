@@ -138,7 +138,7 @@ function App() {
 
       <button
         onClick={() => setIsLoginModal(!isLoginModal)}
-        className="fixed right-4 top-4 z-[60] rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
+        className="fixed right-4 top-4 z-60 rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
       >
         {isLoginModal ? "Закрити" : "Увійти"}
       </button>
@@ -159,7 +159,7 @@ function App() {
       {/* Головна сітка: Сайдбар зліва + Контент справа */}
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Сайдбар: Єдиний акуратний блок студента + прогрес курсу + таймер */}
-        <aside className="w-full lg:w-80 flex flex-col gap-4 flex-shrink-0">
+        <aside className="w-full lg:w-80 flex flex-col gap-4 shrink-0">
           {/* Картка студента (UserProfile) */}
           <UserProfile
             fullName={userProfile.name}

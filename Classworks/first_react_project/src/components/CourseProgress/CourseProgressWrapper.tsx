@@ -1,17 +1,12 @@
-import type { CourseDetails } from "@/data/courses";
+import type { CourseDetails } from "../../data/courses";
 import { courseDetailsData } from "../../data/courses";
 import { Suspense, useEffect, useState } from "react";
 import CourseProgress from "./CourseProgress";
 import CourseProgressSkeleton from "./CourseProgressSkeleton";
-
-const fetchCourseDetails = (id: string): Promise<CourseDetails> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const course = courseDetailsData.find((c) => c.id === id);
-      if (course) resolve(course);
-      else reject(new Error(`Cannot find course with ${id}`));
-    }, 2000);
-  });
+import api from "@/api/client";
+const fetchCourseDetails = async (id: string): Promise<CourseDetails> => {
+  const response = await api.get<CourseDetails>(`/api/courses/${id}`);
+  return response.data;
 };
 
 interface CourseProgressWrapperProps {

@@ -30,7 +30,7 @@ export default function CourseProgressSkeleton() {
             {[...Array(5)].map((_, index) => (
               <div key={index} className="flex items-center space-x-2">
                 {/* Номер списку (симуляція цифр list-decimal) */}
-                <div className="h-4 bg-gray-200 rounded w-3 flex-shrink-0"></div>
+                <div className="h-4 bg-gray-200 rounded w-3 shrink-0"></div>
                 {/* Текст модуля різної довжини для реалістичності */}
                 <div
                   className="h-4 bg-gray-200 rounded"
