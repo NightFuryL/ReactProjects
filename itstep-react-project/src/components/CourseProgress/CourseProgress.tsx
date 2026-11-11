@@ -1,6 +1,7 @@
 import { use, useState, useOptimistic, useTransition } from "react";
 import type { CourseDetails, Module } from "../../data/courses";
 import { CheckCircle, CheckCircle2 } from "lucide-react";
+import api from "@/api/client";
 interface CourseProgressProps {
   coursePromise: Promise<CourseDetails>;
 }
@@ -47,21 +48,12 @@ export default function CourseProgress({
       setOptimisticDetails(module.name);
 
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        if (Math.random() > 0.85) {
-          throw new Error("Server error");
-        }
-
-        const updatedModules = courseDetails.modules.map((m) =>
-          m.name === module.name ? { ...m, isCompleted: !m.isCompleted } : m,
+        const response = await api.patch<CourseDetails>(
+          `/api/courses/${courseDetails.id}/modules`,
+          { moduleName: module.name },
         );
 
-        setCourseDetails({
-          ...courseDetails,
-          modules: updatedModules,
-          completedModules: updatedModules.filter((m) => m.isCompleted).length,
-        });
+        setCourseDetails(response.data);
       } catch (error) {
         alert("Не вдалося оновити статус модулю. Спробуйте ще раз.");
       }
@@ -99,7 +91,7 @@ export default function CourseProgress({
 
         <div>
           {optimisticDetails?.modules.map((m, index) => (
-            <div className="flex justify-between">
+            <div key={m.name} className="flex justify-between">
               <div>
                 <p>
                   <span className="font-mono">{index + 1}. </span>{" "}
@@ -110,7 +102,7 @@ export default function CourseProgress({
                 disabled={isPending}
                 onClick={() => handleToggleModule(m)}
                 className={`px-3 py-1 text-sm rounded-md transition-colors font-bold
-                ${m.isCompleted ? "text-green-700" : "text-gray-700"}`}
+        ${m.isCompleted ? "text-green-700" : "text-gray-700"}`}
               >
                 {m.isCompleted ? <CheckCircle /> : <CheckCircle2 />}
               </button>

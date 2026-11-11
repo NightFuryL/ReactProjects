@@ -137,6 +137,47 @@ app.get('/api/courses/:id', (req, res) => {
     })
 })
 
+app.patch('/api/courses/:id/modules', (req, res) => {
+    // 1. Логируем сам факт прихода запроса
+    console.log(`Отримано PATCH-запит для курсу: ${req.params.id}`, req.body);
+
+    const token = req.cookies.accessToken;
+
+    if (!token) {
+        console.log("Помилка: Access token відсутній в cookie");
+        return res.status(401).json({ message: "Access token is missing" });
+    }
+
+    jwt.verify(token, ACCESS_SECRET, (err) => {
+        if (err) {
+            console.log("Помилка: Невалідний або прострочений токен");
+            return res.status(401).json({ message: "Token expired" });
+        }
+
+        const courseId = req.params.id;
+        const { moduleName } = req.body;
+
+        const targetCourse = courseDetailsData.find(c => c.id == courseId);
+        if (!targetCourse) {
+            console.log(`Курс ${courseId} не знайдено`);
+            return res.status(404).json({ message: "Course not found" });
+        }
+
+        const targetModule = targetCourse.modules.find(m => m.name === moduleName);
+        if (!targetModule) {
+            console.log(`Модуль "${moduleName}" не знайдено`);
+            return res.status(404).json({ message: "Module not found" });
+        }
+
+        targetModule.isCompleted = !targetModule.isCompleted;
+        targetCourse.completedModules = targetCourse.modules.filter(m => m.isCompleted).length;
+
+        console.log(`Module "${moduleName}" toggled to ${targetModule.isCompleted}`);
+
+        res.json(targetCourse);
+    });
+});
+
 
 const PORT = 3001;
 app.listen(PORT, () => {
