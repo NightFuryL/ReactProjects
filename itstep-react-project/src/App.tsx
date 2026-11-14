@@ -5,7 +5,7 @@ import { type CourseDetails } from "./data/courses";
 import api from "./api/client";
 import CourseProgressWrapper from "./components/CourseProgress/CourseProgressWrapper";
 import LoginForm from "./components/LoginForm";
-import EditProfileFrom from "./components/EditProfileForm";
+import EditProfileForm from "./components/EditProfileForm";
 
 import { Toaster } from "react-hot-toast";
 import Header from "./components/Header";
@@ -34,6 +34,11 @@ const fetchCourses = async (): Promise<CourseDetails[]> => {
     throw new Error("Failed to fetch courses");
   }
 
+  return response.data;
+};
+
+const fetchAssignments = async () => {
+  const response = await api.get("/api/assignments");
   return response.data;
 };
 
@@ -132,6 +137,11 @@ function App() {
     queryFn: fetchCourses,
   });
 
+  const { data: assignments = assignmentsData } = useQuery({
+    queryKey: ["assignments"],
+    queryFn: fetchAssignments,
+  });
+
   const filteredCourses = data
     ? data.filter((course) =>
         course.title.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -179,20 +189,14 @@ function App() {
         </div>
       )}
 
-      <EditProfileFrom />
+      <EditProfileForm />
 
       {/* Головна сітка: Сайдбар зліва + Контент справа */}
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Сайдбар: Єдиний акуратний блок студента + прогрес курсу + таймер */}
         <aside className="w-full lg:w-80 flex flex-col gap-4 shrink-0">
           {/* Картка студента (UserProfile) */}
-          <UserProfile
-            fullName={userProfile.name}
-            phone={userProfile.phone}
-            email={userProfile.email}
-            city={userProfile.city}
-            specialty={userProfile.specialty}
-          />
+          <UserProfile />
 
           {/* Віджет групи та статусу з кнопкою перемикання */}
           <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
@@ -256,8 +260,8 @@ function App() {
 
           {/* Двоколонкова сітка: Домашні завдання зліва + Розклад занять справа */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
-            {/* Секція: Мої завдання */}
-            <Section title="Мої завдання">
+            {/* Секція: Мої домашні завдання */}
+            <Section title="Мої домашні завдання">
               <div className="cards-list">
                 {homeworkList.map((hw) => (
                   <HomeworkCard
@@ -291,11 +295,13 @@ function App() {
           <Section title="Секція завдань">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
               <div className="flex flex-col gap-3">
-                {assignmentsData.map((assignment) => (
+                {assignments.map((assignment) => (
                   <AssignmentCard
                     key={assignment.id}
+                    id={assignment.id}
                     courseTitle={assignment.courseTitle}
                     issueDate={assignment.issueDate}
+                    status={assignment.status}
                     isSelected={selectedAssignmentId === assignment.id}
                     onClick={() => setSelectedAssignmentId(assignment.id)}
                   />

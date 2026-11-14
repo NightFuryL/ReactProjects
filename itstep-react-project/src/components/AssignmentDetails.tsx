@@ -3,6 +3,8 @@ import toast from "react-hot-toast";
 import type { Assignment } from "../data/assignments";
 import { assignmentsData } from "../data/assignments";
 import AssignmentDetailsSkeleton from "./AssignmentDetailsSkeleton";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "../api/client";
 
 const promiseMap = new Map<string, Promise<Assignment>>();
 
@@ -38,6 +40,7 @@ function AssignmentDetailsContent({
   const initialAssignment = use(assignmentPromise);
   const [assignment, setAssignment] = useState<Assignment>(initialAssignment);
   const [isPending, startTransition] = useTransition();
+  const queryClient = useQueryClient();
 
   const [optimisticAssignment, setOptimisticAssignment] = useOptimistic(
     assignment,
@@ -47,33 +50,37 @@ function AssignmentDetailsContent({
     }),
   );
 
+  const completeMutation = useMutation({
+    mutationFn: async () => {
+      const response = await api.patch(
+        `/api/assignments/${assignment.id}`,
+        { status: "Здано" },
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      const updated: Assignment = {
+        ...assignment,
+        status: "Здано",
+      };
+      setAssignment(updated);
+      const target = assignmentsData.find((a) => a.id === updated.id);
+      if (target) {
+        target.status = "Здано";
+      }
+      promiseMap.set(updated.id, Promise.resolve(updated));
+      queryClient.invalidateQueries({ queryKey: ["assignments"] });
+      toast.success("Завдання успішно виконано!");
+    },
+    onError: () => {
+      toast.error("Не вдалося виконати завдання. Спробуйте ще раз.");
+    },
+  });
+
   const handleComplete = () => {
     startTransition(async () => {
       setOptimisticAssignment(assignment);
-
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        if (Math.random() < 0.05) {
-          throw new Error("Server error");
-        }
-
-        const updated: Assignment = {
-          ...assignment,
-          status: "Здано",
-        };
-
-        const target = assignmentsData.find((a) => a.id === updated.id);
-        if (target) {
-          target.status = "Здано";
-        }
-
-        promiseMap.set(updated.id, Promise.resolve(updated));
-        setAssignment(updated);
-        toast.success("Завдання успішно виконано!");
-      } catch {
-        toast.error("Не вдалося виконати завдання. Спробуйте ще раз.");
-      }
+      completeMutation.mutate();
     });
   };
 

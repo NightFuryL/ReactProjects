@@ -11,6 +11,8 @@ import { Loader2, X } from "lucide-react";
 import Select from "react-select";
 import toast from "react-hot-toast";
 import api from "@/api/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchProfile } from "./UserProfile";
 
 const languageOptions = [
   { value: "uk", label: "Українська" },
@@ -23,6 +25,8 @@ const languageOptions = [
 
 const editProfileScheme = z.object({
   fullName: z.string().min(1, "ПІБ обов'язкове"),
+  specialty: z.string().min(1, "Спеціальність обов'язкова"),
+  city: z.string().min(1, "Місто обов'язкове"),
   email: z
     .string()
     .min(1, "Електронна пошта обов'язкова")
@@ -54,6 +58,8 @@ const editProfileScheme = z.object({
 type IEditProfileForm = z.infer<typeof editProfileScheme>;
 
 export default function EditProfileForm() {
+  const queryClient = useQueryClient();
+
   const {
     register,
     control,
@@ -64,6 +70,8 @@ export default function EditProfileForm() {
     resolver: zodResolver(editProfileScheme),
     defaultValues: {
       fullName: "",
+      specialty: "",
+      city: "",
       email: "",
       phones: [{ number: "" }],
       languages: [],
@@ -85,41 +93,51 @@ export default function EditProfileForm() {
     name: "socials",
   });
 
+  const { data: profileData } = useQuery({
+    queryKey: ["profile"],
+    queryFn: fetchProfile,
+  });
+
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await api.get("/api/update-profile");
-        if (response.data) {
-          reset({
-            fullName: response.data.fullName || "",
-            email: response.data.email || "",
-            phones:
-              response.data.phones && response.data.phones.length > 0
-                ? response.data.phones
-                : [{ number: "" }],
-            languages: response.data.languages || [],
-            socials:
-              response.data.socials && response.data.socials.length > 0
-                ? response.data.socials
-                : [{ name: "", url: "" }],
-          });
-        }
-      } catch {
-        // Якщо профіль ще не створений або файл відсутній — залишаємо порожню форму
-      }
-    };
+    if (profileData) {
+      reset({
+        fullName: profileData.fullName || "",
+        specialty: profileData.specialty || "",
+        city: profileData.city || "",
+        email: profileData.email || "",
+        phones:
+          profileData.phones && profileData.phones.length > 0
+            ? profileData.phones
+            : profileData.phone
+              ? [{ number: profileData.phone }]
+              : [{ number: "" }],
+        languages: profileData.languages || [],
+        socials:
+          profileData.socials && profileData.socials.length > 0
+            ? profileData.socials
+            : [{ name: "", url: "" }],
+      });
+    }
+  }, [profileData, reset]);
 
-    fetchProfile();
-  }, [reset]);
-
-  const onSubmit: SubmitHandler<IEditProfileForm> = async (data) => {
-    try {
-      await api.post("/api/update-profile", data);
+  const updateProfileMutation = useMutation({
+    mutationFn: async (formData: IEditProfileForm) => {
+      const response = await api.post("/api/update-profile", formData);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["profile"], data?.data || data);
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
       toast.success("Профіль успішно збережено!");
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error("Помилка збереження профілю: ", error);
       toast.error("Не вдалося зберегти профіль. Перевірте дані та спробуйте ще раз.");
-    }
+    },
+  });
+
+  const onSubmit: SubmitHandler<IEditProfileForm> = (data) => {
+    updateProfileMutation.mutate(data);
   };
 
   return (
@@ -198,6 +216,70 @@ export default function EditProfileForm() {
               className="text-xs font-medium text-red-600"
             >
               {errors.email.message}
+            </p>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="student-specialty"
+            className="text-sm font-medium text-slate-700"
+          >
+            Спеціальність
+          </label>
+          <input
+            type="text"
+            id="student-specialty"
+            placeholder="Fullstack Developer"
+            aria-invalid={Boolean(errors.specialty)}
+            aria-describedby={
+              errors.specialty ? "student-specialty-error" : undefined
+            }
+            className={`w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-4 ${
+              errors.specialty
+                ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+                : "border-slate-300 focus:border-blue-500 focus:ring-blue-100"
+            }`}
+            {...register("specialty")}
+          />
+          {errors.specialty && (
+            <p
+              id="student-specialty-error"
+              role="alert"
+              className="text-xs font-medium text-red-600"
+            >
+              {errors.specialty.message}
+            </p>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="student-city"
+            className="text-sm font-medium text-slate-700"
+          >
+            Місто
+          </label>
+          <input
+            type="text"
+            id="student-city"
+            placeholder="Одеса, Україна"
+            aria-invalid={Boolean(errors.city)}
+            aria-describedby={errors.city ? "student-city-error" : undefined}
+            className={`w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-4 ${
+              errors.city
+                ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+                : "border-slate-300 focus:border-blue-500 focus:ring-blue-100"
+            }`}
+            {...register("city")}
+          />
+          {errors.city && (
+            <p
+              id="student-city-error"
+              role="alert"
+              className="text-xs font-medium text-red-600"
+            >
+              {errors.city.message}
             </p>
           )}
         </div>
@@ -404,11 +486,11 @@ export default function EditProfileForm() {
       </div>
 
       <button
-        disabled={isSubmitting}
+        disabled={isSubmitting || updateProfileMutation.isPending}
         type="submit"
         className="flex min-h-11 items-center justify-center gap-2 self-start rounded-xl bg-blue-700 px-5 py-2.5 font-semibold text-white shadow-sm transition hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {isSubmitting ? (
+        {isSubmitting || updateProfileMutation.isPending ? (
           <>
             <Loader2 size={18} className="animate-spin" />
             Зберігаємо...
