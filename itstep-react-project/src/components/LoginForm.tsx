@@ -32,7 +32,6 @@ export default function LoginForm() {
       const response = await api.post("/api/login", data);
       console.log("Відправлені дані: ", response.data);
 
-      const user = response.data;
     } catch (error) {
       console.error("Помилка під час відправки даних: ", error);
       setError("root", {

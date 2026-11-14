@@ -4,12 +4,6 @@
   "phones": [
     {
       "number": "+380943274872"
-    },
-    {
-      "number": "+380393929483"
-    },
-    {
-      "number": "+380084038583"
     }
   ],
   "languages": [
@@ -18,27 +12,15 @@
       "label": "Українська"
     },
     {
-      "value": "fr",
-      "label": "Французька"
-    },
-    {
-      "value": "pl",
-      "label": "Польська"
-    },
-    {
       "value": "en",
       "label": "Англійська"
+    },
+    {
+      "value": "fr",
+      "label": "Французька"
     }
   ],
   "socials": [
-    {
-      "name": "Youtube",
-      "url": "https://www.youtube.com"
-    },
-    {
-      "name": "Instagram ",
-      "url": "https://www.instagram.com"
-    },
     {
       "name": "Facebook",
       "url": "https://www.facebook.com"

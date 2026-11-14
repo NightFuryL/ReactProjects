@@ -1,4 +1,12 @@
 import { Suspense, useState } from "react";
+
+import { useQuery } from "@tanstack/react-query";
+import { type CourseDetails } from "./data/courses";
+import api from "./api/client";
+import CourseProgressWrapper from "./components/CourseProgress/CourseProgressWrapper";
+import LoginForm from "./components/LoginForm";
+import EditProfileFrom from "./components/EditProfileForm";
+
 import { Toaster } from "react-hot-toast";
 import Header from "./components/Header";
 //import CourseProgress from "./components/CourseProgress/CourseProgress";
@@ -7,20 +15,27 @@ import Section from "./components/Section";
 import FocusTimer from "./components/FocusTimer";
 import HomeworkCard from "./components/HomeworkCard";
 import LessonCard from "./components/LessonCard";
-import CourseReview from "./components/CourseReview";
+//import CourseReview from "./components/CourseReview";
 import UserProfile from "./components/UserProfile";
-import StudyLogs from "./components/StudyLogs";
+//import StudyLogs from "./components/StudyLogs";
 import StudyReminder from "./components/StudyReminder";
-import LoginForm from "./components/LoginForm";
-import EditProfileFrom from "./components/EditProfileForm";
 import "./App.css";
 
-import { courseDetailsData } from "./data/courses";
+//import { courseDetailsData } from "./data/courses";
 import AssignmentCard from "./components/AssignmentCard";
 import AssignmentDetails from "./components/AssignmentDetails";
 import AssignmentDetailsSkeleton from "./components/AssignmentDetailsSkeleton";
 import { assignmentsData } from "./data/assignments";
-import CourseProgressWrapper from "./components/CourseProgress/CourseProgressWrapper";
+
+const fetchCourses = async (): Promise<CourseDetails[]> => {
+  const response = await api.get("/api/courses/");
+
+  if (!response.status) {
+    throw new Error("Failed to fetch courses");
+  }
+
+  return response.data;
+};
 
 // Домашні завдання з Practice_24_09_2026
 const initialHomeworkList = [
@@ -98,31 +113,6 @@ function App() {
     }));
   };
 
-  const [courses] = useState(courseDetailsData);
-  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
-  const [selectedAssignmentId, setSelectedAssignmentId] = useState<
-    string | null
-  >(null);
-  const selectedCourse = courses.find((c) => c.id === selectedCourseId);
-
-  const [homeworkList, setHomeworkList] = useState(initialHomeworkList);
-
-  const filteredCourses = courses.filter(
-    (course) =>
-      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.teacher.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  /*const handleCompleteLesson = (courseId: string) => {
-    setCourses((prevCourses) =>
-      prevCourses.map((course) =>
-        course.id === courseId && course.completedLessons < course.totalLessons
-          ? { ...course, completedLessons: course.completedLessons + 1 }
-          : course,
-      ),
-    );
-  };*/
-
   const handleTurnInHomework = (hwId: number) => {
     setHomeworkList((prev) =>
       prev.map((hw) =>
@@ -130,6 +120,41 @@ function App() {
       ),
     );
   };
+  const [homeworkList, setHomeworkList] = useState(initialHomeworkList);
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState<
+    string | null
+  >(null);
+
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+
+  const { data, isPending, error, isError } = useQuery({
+    queryKey: ["courses"],
+    queryFn: fetchCourses,
+  });
+
+  const filteredCourses = data
+    ? data.filter((course) =>
+        course.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    : [];
+
+  const courseContent = isPending ? (
+    <div className="text-gray-500">Завантажуємо курси...</div>
+  ) : isError ? (
+    <div className="text-rose-400">
+      Помилка при завантажені курсів: {error.message}
+    </div>
+  ) : filteredCourses.length != 0 ? (
+    filteredCourses.map((course) => (
+      <CourseCard
+        key={course.id}
+        title={course.title}
+        onSelect={() => setSelectedCourseId(course.id)}
+      />
+    ))
+  ) : (
+    <p className="text-gray-500">Курсів не знайдено.</p>
+  );
 
   return (
     <div className="App p-4 max-w-7xl mx-auto">
@@ -226,22 +251,7 @@ function App() {
                 </span>
               )}
             </div>
-
-            <div className="flex flex-wrap gap-4">
-              {filteredCourses.length !== 0 ? (
-                filteredCourses.map((course) => (
-                  <CourseCard
-                    key={course.id}
-                    {...course}
-                    onSelect={() => setSelectedCourseId(course.id)}
-                  />
-                ))
-              ) : (
-                <p className="text-gray-500 text-sm py-2">
-                  Немає курсів, що відповідають вашому запиту.
-                </p>
-              )}
-            </div>
+            <div className="flex flex-wrap">{courseContent}</div>
           </Section>
 
           {/* Двоколонкова сітка: Домашні завдання зліва + Розклад занять справа */}
@@ -301,6 +311,7 @@ function App() {
           </Section>
 
           {/* Секція: Відгуки про курс */}
+          {/* закоментовано, бо довговато перероблювати на новий функціонал
           <Section title="Відгуки про курс">
             <CourseReview initialCourseName={selectedCourse?.title} />
           </Section>
@@ -318,7 +329,7 @@ function App() {
               }}
             />
           </Section>
-
+          */}
           <Section title="Нагадування про навчання">
             <StudyReminder />
           </Section>
