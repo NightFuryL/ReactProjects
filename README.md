@@ -106,15 +106,38 @@ npm run dev
   
   *(Де `dd`, `mm` та `yyyy` — день, місяць та повний рік видачі чи виконання завдання).*
 * Усі логічно завершені етапи фіксуються атомарними коммітами за конвенцією **Conventional Commits**:  
-  `feat: add EditProfileForm with zod and react-hook-form`, `feat: implement jwt refresh cookie rotation in server.js`, `feat: add CourseProgressSkeleton for Suspense loading`, `chore(main): restructure project layout` тощо.
+  `feat(<гілка_роботи>): add EditProfileForm with zod and react-hook-form`, `feat(<гілка_роботи>): implement jwt refresh cookie rotation in server.js`, `feat(<гілка_роботи>): add CourseProgressSkeleton for Suspense loading`, `chore(main): restructure project layout` тощо. Де замість <гілка_роботи> буде вставлено назву гілки, де була реалізована робота.
 * Після перевірки та локального тестування гілка зливається в основну гілку `main`.
 
 ---
 
 ## 🚀 Остання влита робота:
-### Практична робота 05.11.2026 
+### Домашня робота 05.11.2026 
 Остання актуальна робота, що була перевірена та влита в `main`
-
+**Збереження профілю у файл (Node.js `fs` & REST API)**:
+  * Створено ендпоінт `/api/update-profile` на сервері для збереження та оновлення даних користувача.
+  * Для збереження даних реалізовано запис у файл [`profile.json`](./itstep-react-project/profile.json) за допомогою вбудованого модуля Node.js `fs` (File System): розібрався з роботою методів `fs.existsSync`, `fs.readFileSync` та `fs.writeFileSync`.
+  * Реалізовано логіку оновлення: якщо файл вже створений — дані акуратно оновлюються, якщо ні — валідуються та створюється новий файл із форматованим JSON.
+  * Інтегровано запит з форми [`EditProfileForm`](./itstep-react-project/src/components/EditProfileForm.tsx) через Axios з відображенням статусів збереження (`react-hot-toast`).
+(не знав як краще зберігати треба було, то я розібрався та так зробив зберігання, за допомогою такого способу)
 ### Підтвердження виконання (Скріншоти та результати тестування):
 
+---
 ![Немає фото](images/1.jpg)
+> **Ввів деякі дані в поля, додав номер та мову**
+---
+
+![Немає фото](images/2.jpg)
+> **Доказ, те, що воно зберігає в файл [profile.json](./itstep-react-project/profile.json)**
+
+---
+
+![Немає фото](images/3.jpg)
+> **Ввів додатково дані в поля, додав ще номер та ще мову**
+
+---
+
+![Немає фото](images/4.jpg)
+> **Доказ, те, що воно перезаписує профіль в файлі [profile.json](./itstep-react-project/profile.json)**
+
+---

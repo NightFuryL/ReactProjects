@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   useForm,
   type SubmitHandler,
@@ -8,6 +9,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, X } from "lucide-react";
 import Select from "react-select";
+import toast from "react-hot-toast";
+import api from "@/api/client";
 
 const languageOptions = [
   { value: "uk", label: "Українська" },
@@ -55,6 +58,7 @@ export default function EditProfileForm() {
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<IEditProfileForm>({
     resolver: zodResolver(editProfileScheme),
@@ -81,8 +85,41 @@ export default function EditProfileForm() {
     name: "socials",
   });
 
-  const onSubmit: SubmitHandler<IEditProfileForm> = (data) => {
-    console.log("New profile data: ", data);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get("/api/update-profile");
+        if (response.data) {
+          reset({
+            fullName: response.data.fullName || "",
+            email: response.data.email || "",
+            phones:
+              response.data.phones && response.data.phones.length > 0
+                ? response.data.phones
+                : [{ number: "" }],
+            languages: response.data.languages || [],
+            socials:
+              response.data.socials && response.data.socials.length > 0
+                ? response.data.socials
+                : [{ name: "", url: "" }],
+          });
+        }
+      } catch {
+        // Якщо профіль ще не створений або файл відсутній — залишаємо порожню форму
+      }
+    };
+
+    fetchProfile();
+  }, [reset]);
+
+  const onSubmit: SubmitHandler<IEditProfileForm> = async (data) => {
+    try {
+      await api.post("/api/update-profile", data);
+      toast.success("Профіль успішно збережено!");
+    } catch (error) {
+      console.error("Помилка збереження профілю: ", error);
+      toast.error("Не вдалося зберегти профіль. Перевірте дані та спробуйте ще раз.");
+    }
   };
 
   return (
