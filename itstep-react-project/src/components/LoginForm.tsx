@@ -31,7 +31,6 @@ export default function LoginForm() {
     try {
       const response = await api.post("/api/login", data);
       console.log("Відправлені дані: ", response.data);
-
     } catch (error) {
       console.error("Помилка під час відправки даних: ", error);
       setError("root", {
@@ -73,6 +72,7 @@ export default function LoginForm() {
           }`}
           placeholder="name@example.com"
           {...register("email")}
+          value={"lvumba@gmail.com"} // Щоб не водити пошту кожен разу навіть дял тестування
         />
         {errors.email && (
           <p
@@ -105,6 +105,7 @@ export default function LoginForm() {
           }`}
           placeholder="Мінімум 8 символів"
           {...register("password")}
+          value={"SecretPassword123"} // Щоб не водити пароль кожен разу навіть дял тестування
         />
         {errors.password && (
           <p

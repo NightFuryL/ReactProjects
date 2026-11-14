@@ -11,6 +11,32 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROFILE_FILE = path.join(__dirname, "profile.json");
 
+const defaultProfile = {
+    fullName: "Лев",
+    group: "P-410",
+    specialty: "Fullstack Developer",
+    phone: "+380 12 345 67 89",
+    email: "lvumba@gmail.com",
+    city: "Одеса, Україна",
+    phones: [{ number: "+380 12 345 67 89" }],
+    languages: [
+        { value: "uk", label: "Українська" },
+        { value: "en", label: "Англійська" }
+    ],
+    socials: [
+        { name: "GitHub", url: "https://github.com" }
+    ]
+};
+
+if (!fs.existsSync(PROFILE_FILE)) {
+    try {
+        fs.writeFileSync(PROFILE_FILE, JSON.stringify(defaultProfile, null, 2), "utf-8");
+        console.log("Файл profile.json створено з початковими даними.");
+    } catch (err) {
+        console.error("Не вдалося створити profile.json:", err);
+    }
+}
+
 const app = express();
 app.use(cors({
     origin: 'http://localhost:5173',
@@ -274,6 +300,106 @@ const handleUpdateProfile = (req, res) => {
 
 app.post('/api/update-profile', handleUpdateProfile);
 app.put('/api/update-profile', handleUpdateProfile);
+
+export let assignmentsData = [
+  {
+    id: "a1",
+    courseTitle: "React Frontend",
+    moduleTitle: "Вступ до JSX та Компонентів",
+    description: "Створити компонентну структуру для каталогу товарів із використанням типізованих пропсів та умовного рендерингу.",
+    issueDate: "10 Жовтня 2026",
+    deadlineDate: "17 Жовтня 2026",
+    status: "Здано",
+  },
+  {
+    id: "a2",
+    courseTitle: "React Frontend",
+    moduleTitle: "Локальний стан та Пропси",
+    description: "Реалізувати інтерактивний список завдань із можливістю фільтрації за статусом та збереженням стану в useState.",
+    issueDate: "14 Жовтня 2026",
+    deadlineDate: "21 Жовтня 2026",
+    status: "Не здано",
+  },
+  {
+    id: "a3",
+    courseTitle: "JavaScript Advanced",
+    moduleTitle: "Асинхронність та Event Loop",
+    description: "Написати модуль для роботи з асинхронними запитами за допомогою Promises та async/await з обробкою помилок.",
+    issueDate: "05 Жовтня 2026",
+    deadlineDate: "12 Жовтня 2026",
+    status: "Здано",
+  },
+  {
+    id: "a4",
+    courseTitle: "Основи HTML та CSS",
+    moduleTitle: "Системи розкладки: Flexbox та Grid",
+    description: "Верстка адаптивної сторінки дашборду для освітньої платформи з використанням CSS Grid та Flexbox.",
+    issueDate: "01 Жовтня 2026",
+    deadlineDate: "08 Жовтня 2026",
+    status: "Здано",
+  },
+  {
+    id: "a5",
+    courseTitle: "Fullstack на Next.js",
+    moduleTitle: "Серверні vs Клієнтські компоненти",
+    description: "Розробити блог з гібридним рендерингом, оптимізацією зображень та серверною пагінацією статей.",
+    issueDate: "12 Жовтня 2026",
+    deadlineDate: "20 Жовтня 2026",
+    status: "Не здано",
+  },
+  {
+    id: "a6",
+    courseTitle: "Програмування на C++",
+    moduleTitle: "Вказівники та динамічна пам'ять",
+    description: "Реалізувати власний клас динамічного масиву з глибоким копіюванням, перевантаженням операторів та семантикою переміщення.",
+    issueDate: "08 Жовтня 2026",
+    deadlineDate: "16 Жовтня 2026",
+    status: "Не здано",
+  },
+];
+
+app.get('/api/assignments', (req, res) => {
+    res.json(assignmentsData);
+});
+
+app.get('/api/assignments/:id', (req, res) => {
+    const assignment = assignmentsData.find(a => a.id === req.params.id);
+    if (!assignment) {
+        return res.status(404).json({ message: "Завдання не знайдено" });
+    }
+    res.json(assignment);
+});
+
+app.patch('/api/assignments/:id/toggle-status', (req, res) => {
+    const { id } = req.params;
+    const assignment = assignmentsData.find(a => a.id === id);
+
+    if (!assignment) {
+        return res.status(404).json({ message: "Завдання не знайдено" });
+    }
+
+    assignment.status = assignment.status === "Здано" ? "Не здано" : "Здано";
+    console.log(`Статус завдання ${id} оновлено на: ${assignment.status}`);
+
+    res.json({ message: "Статус завдання змінено", assignment });
+});
+
+app.patch('/api/assignments/:id', (req, res) => {
+    const { id } = req.params;
+    const assignment = assignmentsData.find(a => a.id === id);
+
+    if (!assignment) {
+        return res.status(404).json({ message: "Завдання не знайдено" });
+    }
+
+    if (req.body && req.body.status) {
+        assignment.status = req.body.status;
+    } else {
+        assignment.status = assignment.status === "Здано" ? "Не здано" : "Здано";
+    }
+
+    res.json({ message: "Статус завдання змінено", assignment });
+});
 
 
 const PORT = 3001;
