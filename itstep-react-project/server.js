@@ -3,6 +3,13 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import { request } from "node:http";
 import cookieParser from "cookie-parser";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PROFILE_FILE = path.join(__dirname, "profile.json");
 
 const app = express();
 app.use(cors({
@@ -177,6 +184,53 @@ app.patch('/api/courses/:id/modules', (req, res) => {
         res.json(targetCourse);
     });
 });
+
+app.get('/api/update-profile', (req, res) => {
+    if (!fs.existsSync(PROFILE_FILE)) {
+        return res.status(404).json({ message: "Профіль ще не створено" });
+    }
+
+    try {
+        const fileData = fs.readFileSync(PROFILE_FILE, "utf-8");
+        const profile = JSON.parse(fileData);
+        res.json(profile);
+    } catch (err) {
+        console.error("Помилка читання файлу:", err);
+        res.status(500).json({ message: "Помилка при читанні файлу профілю" });
+    }
+});
+
+const handleUpdateProfile = (req, res) => {
+    const profileData = req.body;
+
+    if (!profileData || typeof profileData !== "object") {
+        return res.status(400).json({ message: "Дані профілю відсутні" });
+    }
+
+    const { fullName, email } = profileData;
+    if (!fullName || !fullName.trim() || !email || !email.trim()) {
+        return res.status(400).json({ message: "Заповніть обов'язкові поля" });
+    }
+
+    let resultData = profileData;
+
+    try {
+        if (fs.existsSync(PROFILE_FILE)) {
+            const currentData = JSON.parse(fs.readFileSync(PROFILE_FILE, "utf-8"));
+            resultData = { ...currentData, ...profileData };
+        }
+
+        fs.writeFileSync(PROFILE_FILE, JSON.stringify(resultData, null, 2), "utf-8");
+        console.log("Профіль успішно збережено у файл profile.json");
+        return res.json({ message: "Профіль успішно збережено", data: resultData });
+    } catch (err) {
+        console.error("Помилка при збереженні файлу:", err);
+        return res.status(500).json({ message: "Помилка сервера при збереженні даних" });
+    }
+};
+
+app.post('/api/update-profile', handleUpdateProfile);
+app.put('/api/update-profile', handleUpdateProfile);
 
 
 const PORT = 3001;
