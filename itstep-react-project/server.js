@@ -124,6 +124,49 @@ export const courseDetailsData = [
     }
 ];
 
+app.get('/api/courses', (req, res) => {
+    res.json(courseDetailsData);
+});
+
+app.patch('/api/courses/:id/toggle-module', (req, res) => {
+    const token = req.cookies.accessToken;
+
+    if (!token) {
+        return res.status(401).json({ message: 'Немає доступу (відсутній токен)' });
+    }
+
+    jwt.verify(token, ACCESS_SECRET, (err) => {
+        if (err) {
+            return res.status(401).json({ message: 'Токен прострочений' });
+        }
+
+        const courseId = req.params.id;
+        const { moduleName } = req.body;
+
+        console.log('ID з URL:', courseId, 'Тип:', typeof courseId);
+        console.log('Тіло запиту:', req.body);
+
+        const targetCourse = courseDetailsData.find((c) => c.id === courseId);
+        if (!targetCourse) {
+            return res.status(404).json({ message: 'Курс не знайдено' });
+        }
+
+        const targetModule = targetCourse.modules.find(
+            (m) => m.name === moduleName,
+        );
+        if (!targetModule) {
+            return res.status(404).json({ message: 'Модуль не знайдено' });
+        }
+
+        targetModule.isCompleted = !targetModule.isCompleted;
+        targetCourse.completedModules = targetCourse.modules.filter(
+            (m) => m.isCompleted,
+        ).length;
+
+        res.json({ message: 'Статус збережено', course: targetCourse });
+    });
+});
+
 app.get('/api/courses/:id', (req, res) => {
     const token = req.cookies.accessToken;
 
