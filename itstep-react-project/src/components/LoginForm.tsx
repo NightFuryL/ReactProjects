@@ -1,4 +1,5 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
+import { useNavigate } from "react-router";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -18,6 +19,8 @@ const loginSchema = z.object({
 type ILoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -31,6 +34,8 @@ export default function LoginForm() {
     try {
       const response = await api.post("/api/login", data);
       console.log("Відправлені дані: ", response.data);
+
+      navigate("/dashboard", { replace: true });
     } catch (error) {
       console.error("Помилка під час відправки даних: ", error);
       setError("root", {
