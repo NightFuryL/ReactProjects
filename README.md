@@ -111,31 +111,26 @@ npm run dev
 
 ---
 
-## 🚀 Остання влита робота:
-### Домашня робота 12.11.2026
-Остання актуальна робота, що була перевірена та влита в `main`
+## 🚀 Остання робота
+### 19 листопада 2026 — авторизація, маршрутизація та каталог курсів
+
+Сьогоднішні зміни об'єднують інтерфейс дашборда, авторизацію та пошук курсів у цілісний застосунок.
+
+#### 🔐 Авторизація та маршрутизація
+* Налаштовано маршрути для головної сторінки, входу, захищеного дашборда та каталогу курсів у [router.tsx](./itstep-react-project/src/router.tsx).
+* Додано спільний макет з навігацією та місцем для вкладених сторінок у [MainLayout.tsx](./itstep-react-project/src/layouts/MainLayout.tsx).
+* Розділено доступ до публічних і захищених сторінок за допомогою [PublicRoute.tsx](./itstep-react-project/src/components/PublicRoute.tsx), [ProtectedRoute.tsx](./itstep-react-project/src/components/ProtectedRoute.tsx) та перевірки поточного користувача в [useAuth.tsx](./itstep-react-project/src/hooks/useAuth.tsx).
+* Підключено сторінки привітання та входу: [HomePage.tsx](./itstep-react-project/src/pages/HomePage.tsx), [LoginPage.tsx](./itstep-react-project/src/pages/LoginPage.tsx) і [LoginForm.tsx](./itstep-react-project/src/components/LoginForm.tsx).
+* Винесено запуск роутера в [main.tsx](./itstep-react-project/src/main.tsx), а навігацію до дашборда й каталогу — у [Header.tsx](./itstep-react-project/src/components/Header.tsx).
+
+#### 📚 Дашборд і каталог курсів
+* Основний інтерфейс винесено зі [старого App.tsx](./itstep-react-project/src/App.tsx) в окрему [DashboardPage.tsx](./itstep-react-project/src/pages/DashboardPage.tsx).
+* Додано сторінку пошуку курсів із debounce-введенням, синхронізацією запиту з URL та відображенням станів завантаження й помилок у [CoursesSearchPage.tsx](./itstep-react-project/src/pages/CoursesSearchPage.tsx).
+* Розширено локальний Express API: логіка входу та оновлення токенів, дані курсів і пошук курсів обробляються в [server.js](./itstep-react-project/server.js); локальні дані зберігаються в [courses.json](./itstep-react-project/courses.json).
+* Налаштовано Vite proxy для API та alias `@` у [vite.config.ts](./itstep-react-project/vite.config.ts).
+
+#### ✅ Перевірка
+* `npm run build` — збірка пройшла успішно.
+
 
 ### Підтвердження виконання (Скріншоти та результати тестування) для домашньої чи практичної роботи:
-### Роботу зробив ось як:
-> ### 1. Я об'єднав та зроби синхронізацію між **[`EditProfileForm.tsx`](./itstep-react-project/src/components/EditProfileForm.tsx)** та **[`UserProfile.tsx`](./itstep-react-project/src/components/UserProfile.tsx)**, при збереженні даних, карточка профіля змінюється, навіть всі номери телефону виводяться.
-
-> ### 2. Просто замінив функціонал
----
-![Немає фото](images/1.jpg)
-> **На фото видно базові значення які я зберіг в файлі [`profile.json`](./itstep-react-project/profile.json)**
-
----
-![Немає фото](images/2.jpg)
-> **Змінив значення на інші**
-
----
-![Немає фото](images/3.jpg)
-> **Видно, що на карточці(віджет) UserProfile`а змінилися значення**
-
----
-![Немає фото](images/4.jpg)
-> **Як було в секції завданнь**
-
----
-![Немає фото](images/5.jpg)
-> **Як стало, після натискання кнопки здати**

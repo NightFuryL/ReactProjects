@@ -24,7 +24,7 @@ interface CourseProgressProps {
 export default function CourseProgress({ courseId }: CourseProgressProps) {
   const queryClient = useQueryClient();
 
-  const { data, isError, error } = useSuspenseQuery({
+  const { data } = useSuspenseQuery({
     queryKey: ["courses", courseId],
     queryFn: () => fetchCourseDetails(courseId),
   });

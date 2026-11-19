@@ -1,8 +1,8 @@
 {
-  "fullName": "QWErty",
-  "specialty": "Game developer",
-  "city": "Київ, Україна",
-  "email": "ewqwe12321@gmail.com",
+  "fullName": "Lev",
+  "specialty": "Developer",
+  "city": "Одеса, Україна",
+  "email": "lvumbapumba@gmail.com",
   "phone": "+380 12 345 67 89",
   "phones": [
     {
@@ -24,6 +24,10 @@
     {
       "value": "fr",
       "label": "Французька"
+    },
+    {
+      "value": "de",
+      "label": "Німецька"
     }
   ],
   "socials": [

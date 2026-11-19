@@ -5,6 +5,7 @@ import { request } from "node:http";
 import cookieParser from "cookie-parser";
 import fs from "node:fs";
 import path from "node:path";
+import fs_promises from "fs/promises";
 import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -51,7 +52,11 @@ const ACCESS_SECRET = 'secret-access-key';
 const REFRESH_SECRET = 'secret-refresh-key';
 
 
-
+const readCoursesFromFile = async () => {
+    const filePath = path.join(process.cwd(), 'courses.json');
+    const rawData = await fs_promises.readFile(filePath, 'utf-8');
+    return JSON.parse(rawData);
+};
 
 app.post('/api/login', (req, res) => {
     const accessToken = jwt.sign({ role: 'student' }, ACCESS_SECRET, { expiresIn: '15m' });
@@ -192,7 +197,26 @@ app.patch('/api/courses/:id/toggle-module', (req, res) => {
         res.json({ message: 'Статус збережено', course: targetCourse });
     });
 });
+app.get('/api/courses/search', async (req, res) => {
+    try {
+        const query = (req.query.q || '').toString().trim().toLowerCase();
+        const courses = await readCoursesFromFile();
 
+        // Якщо рядок пошуку порожній — повертаємо порожній масив (або всі курси, якщо прибрати цю умову)
+        if (!query) {
+            return res.json([]);
+        }
+
+        const results = courses
+            .filter((course) => course.title.toLowerCase().includes(query))
+            .map(({ id, title }) => ({ id, title })); // Повертаємо тільки id та title
+
+        res.json(results);
+    } catch (error) {
+        console.error('Помилка читання файлу курсів:', error);
+        res.status(500).json({ message: 'Не вдалося виконати пошук' });
+    }
+});
 app.get('/api/courses/:id', (req, res) => {
     const token = req.cookies.accessToken;
 
@@ -302,60 +326,60 @@ app.post('/api/update-profile', handleUpdateProfile);
 app.put('/api/update-profile', handleUpdateProfile);
 
 export let assignmentsData = [
-  {
-    id: "a1",
-    courseTitle: "React Frontend",
-    moduleTitle: "Вступ до JSX та Компонентів",
-    description: "Створити компонентну структуру для каталогу товарів із використанням типізованих пропсів та умовного рендерингу.",
-    issueDate: "10 Жовтня 2026",
-    deadlineDate: "17 Жовтня 2026",
-    status: "Здано",
-  },
-  {
-    id: "a2",
-    courseTitle: "React Frontend",
-    moduleTitle: "Локальний стан та Пропси",
-    description: "Реалізувати інтерактивний список завдань із можливістю фільтрації за статусом та збереженням стану в useState.",
-    issueDate: "14 Жовтня 2026",
-    deadlineDate: "21 Жовтня 2026",
-    status: "Не здано",
-  },
-  {
-    id: "a3",
-    courseTitle: "JavaScript Advanced",
-    moduleTitle: "Асинхронність та Event Loop",
-    description: "Написати модуль для роботи з асинхронними запитами за допомогою Promises та async/await з обробкою помилок.",
-    issueDate: "05 Жовтня 2026",
-    deadlineDate: "12 Жовтня 2026",
-    status: "Здано",
-  },
-  {
-    id: "a4",
-    courseTitle: "Основи HTML та CSS",
-    moduleTitle: "Системи розкладки: Flexbox та Grid",
-    description: "Верстка адаптивної сторінки дашборду для освітньої платформи з використанням CSS Grid та Flexbox.",
-    issueDate: "01 Жовтня 2026",
-    deadlineDate: "08 Жовтня 2026",
-    status: "Здано",
-  },
-  {
-    id: "a5",
-    courseTitle: "Fullstack на Next.js",
-    moduleTitle: "Серверні vs Клієнтські компоненти",
-    description: "Розробити блог з гібридним рендерингом, оптимізацією зображень та серверною пагінацією статей.",
-    issueDate: "12 Жовтня 2026",
-    deadlineDate: "20 Жовтня 2026",
-    status: "Не здано",
-  },
-  {
-    id: "a6",
-    courseTitle: "Програмування на C++",
-    moduleTitle: "Вказівники та динамічна пам'ять",
-    description: "Реалізувати власний клас динамічного масиву з глибоким копіюванням, перевантаженням операторів та семантикою переміщення.",
-    issueDate: "08 Жовтня 2026",
-    deadlineDate: "16 Жовтня 2026",
-    status: "Не здано",
-  },
+    {
+        id: "a1",
+        courseTitle: "React Frontend",
+        moduleTitle: "Вступ до JSX та Компонентів",
+        description: "Створити компонентну структуру для каталогу товарів із використанням типізованих пропсів та умовного рендерингу.",
+        issueDate: "10 Жовтня 2026",
+        deadlineDate: "17 Жовтня 2026",
+        status: "Здано",
+    },
+    {
+        id: "a2",
+        courseTitle: "React Frontend",
+        moduleTitle: "Локальний стан та Пропси",
+        description: "Реалізувати інтерактивний список завдань із можливістю фільтрації за статусом та збереженням стану в useState.",
+        issueDate: "14 Жовтня 2026",
+        deadlineDate: "21 Жовтня 2026",
+        status: "Не здано",
+    },
+    {
+        id: "a3",
+        courseTitle: "JavaScript Advanced",
+        moduleTitle: "Асинхронність та Event Loop",
+        description: "Написати модуль для роботи з асинхронними запитами за допомогою Promises та async/await з обробкою помилок.",
+        issueDate: "05 Жовтня 2026",
+        deadlineDate: "12 Жовтня 2026",
+        status: "Здано",
+    },
+    {
+        id: "a4",
+        courseTitle: "Основи HTML та CSS",
+        moduleTitle: "Системи розкладки: Flexbox та Grid",
+        description: "Верстка адаптивної сторінки дашборду для освітньої платформи з використанням CSS Grid та Flexbox.",
+        issueDate: "01 Жовтня 2026",
+        deadlineDate: "08 Жовтня 2026",
+        status: "Здано",
+    },
+    {
+        id: "a5",
+        courseTitle: "Fullstack на Next.js",
+        moduleTitle: "Серверні vs Клієнтські компоненти",
+        description: "Розробити блог з гібридним рендерингом, оптимізацією зображень та серверною пагінацією статей.",
+        issueDate: "12 Жовтня 2026",
+        deadlineDate: "20 Жовтня 2026",
+        status: "Не здано",
+    },
+    {
+        id: "a6",
+        courseTitle: "Програмування на C++",
+        moduleTitle: "Вказівники та динамічна пам'ять",
+        description: "Реалізувати власний клас динамічного масиву з глибоким копіюванням, перевантаженням операторів та семантикою переміщення.",
+        issueDate: "08 Жовтня 2026",
+        deadlineDate: "16 Жовтня 2026",
+        status: "Не здано",
+    },
 ];
 
 app.get('/api/assignments', (req, res) => {
@@ -382,6 +406,21 @@ app.patch('/api/assignments/:id/toggle-status', (req, res) => {
     console.log(`Статус завдання ${id} оновлено на: ${assignment.status}`);
 
     res.json({ message: "Статус завдання змінено", assignment });
+});
+app.get('/api/me', (req, res) => {
+    const token = req.cookies.accessToken;
+
+    if (!token) {
+        return res.status(401).json({ message: 'Немає доступу' });
+    }
+
+    jwt.verify(token, ACCESS_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).json({ message: 'Токен прострочений' });
+        }
+
+        res.json({ role: decoded.role });
+    });
 });
 
 app.patch('/api/assignments/:id', (req, res) => {
